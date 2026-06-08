@@ -1,0 +1,23 @@
+from datetime import datetime
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
+from src.database import Base
+
+class ParcelType(Base):
+
+    __tablename__ = "parcel_type"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, unique=True)
+
+class Parcel(Base):
+
+    __tablename__ = "parcel"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    weight_kg = Column(Float)
+    type_id = Column(Integer, ForeignKey("parcel_type.id"))
+    content_value_usd = Column(Float)
+    delivery_cost_rub = Column(Float, nullable=True)
+    user_session_id = Column(String)
+    created_at = Column(DateTime, default=datetime.utcnow)
