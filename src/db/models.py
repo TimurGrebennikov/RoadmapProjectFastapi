@@ -1,16 +1,18 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
+
+from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String
+
 from src.database import Base
 
-class ParcelType(Base):
 
+class ParcelType(Base):
     __tablename__ = "parcel_type"
 
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True)
 
-class Parcel(Base):
 
+class Parcel(Base):
     __tablename__ = "parcel"
 
     id = Column(Integer, primary_key=True)
