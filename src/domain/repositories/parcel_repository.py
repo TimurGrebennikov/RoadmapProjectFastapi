@@ -21,15 +21,15 @@ class ParcelRepository:
         name: str,
         weight_kg: float,
         type_id: int,
-        content_price_usd: float,
+        content_value_usd: float,
     ) -> Parcel:
         """Создать новую посылку"""
         new_parcel = Parcel(
-            session_id=session_id,
+            user_session_id=session_id,
             name=name,
             weight_kg=weight_kg,
             type_id=type_id,
-            content_price_usd=content_price_usd,
+            content_value_usd=content_value_usd,
             delivery_cost_rub=None,
         )
 
@@ -47,7 +47,7 @@ class ParcelRepository:
         limit: int = 10,
     ) -> list[Parcel]:
         """Получить посылки пользователя с фильтрами"""
-        query = select(Parcel).join(ParcelType).where(Parcel.session_id == session_id)
+        query = select(Parcel).join(ParcelType).where(Parcel.user_session_id == session_id)
 
         if type_id is not None:
             query = query.where(Parcel.type_id == type_id)
@@ -66,7 +66,7 @@ class ParcelRepository:
         """Получить посылку по ID"""
         query = select(Parcel).where(
             Parcel.id == parcel_id,
-            Parcel.session_id == session_id,
+            Parcel.user_session_id == session_id,
         )
         result = await self.session.execute(query)
         return result.scalar_one_or_none()

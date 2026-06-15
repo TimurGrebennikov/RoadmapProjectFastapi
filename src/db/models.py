@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database import Base
 
@@ -11,6 +11,8 @@ class ParcelType(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True)
+
+    parcels = relationship("Parcel", back_populates="type")
 
 
 class Parcel(Base):
@@ -25,3 +27,5 @@ class Parcel(Base):
     delivery_cost_rub = Column(Float, nullable=True)
     user_session_id = Column(String)
     created_at = Column(DateTime, default=datetime)
+
+    type = relationship("ParcelType", back_populates="parcels")

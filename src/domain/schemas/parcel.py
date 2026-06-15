@@ -10,7 +10,7 @@ class ParcelCreateSchemas(BaseModel):
     name: str = Field(min_length=1, description="Название посылки")
     weight_kg: float = Field(gt=0, description="Вес в килограммах")
     type_id: int = Field(gt=0, description="ID типа посылки")
-    content_price_usd: float = Field(ge=0, description="Стоимость содержимого в USD")
+    content_value_usd: float = Field(ge=0, description="Стоимость содержимого в USD")
 
 
 class ParcelResponseSchemas(BaseModel):
@@ -19,5 +19,5 @@ class ParcelResponseSchemas(BaseModel):
     weight_kg: float
     type_id: int
     type_name: str
-    content_price_usd: float
+    content_value_usd: float
     delivery_cost_rub: float | None = None
