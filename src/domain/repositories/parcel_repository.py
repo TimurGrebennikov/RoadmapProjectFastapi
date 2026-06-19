@@ -1,5 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload  # ← ДОБАВЬ ЭТОТ ИМПОРТ!
 
 from src.db.models import Parcel, ParcelType
 
@@ -13,7 +14,7 @@ class ParcelRepository:
         query = select(ParcelType)
         result = await self.session.execute(query)
         types = result.scalars().all()
-        return list(types)  # Преобразуем в list для правильной типизации
+        return list(types)
 
     async def create_parcel(
         self,
@@ -47,7 +48,11 @@ class ParcelRepository:
         limit: int = 10,
     ) -> list[Parcel]:
         """Получить посылки пользователя с фильтрами"""
-        query = select(Parcel).join(ParcelType).where(Parcel.user_session_id == session_id)
+        query = (
+            select(Parcel)
+            .options(selectinload(Parcel.parcel_type))
+            .where(Parcel.user_session_id == session_id)
+        )
 
         if type_id is not None:
             query = query.where(Parcel.type_id == type_id)
@@ -64,9 +69,13 @@ class ParcelRepository:
 
     async def get_parcel_by_id(self, parcel_id: int, session_id: str) -> Parcel | None:
         """Получить посылку по ID"""
-        query = select(Parcel).where(
-            Parcel.id == parcel_id,
-            Parcel.user_session_id == session_id,
+        query = (
+            select(Parcel)
+            .options(selectinload(Parcel.parcel_type))
+            .where(
+                Parcel.id == parcel_id,
+                Parcel.user_session_id == session_id,
+            )
         )
         result = await self.session.execute(query)
         return result.scalar_one_or_none()
