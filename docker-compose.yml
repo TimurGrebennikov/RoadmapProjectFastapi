@@ -37,6 +37,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/delivery
       - REDIS_URL=redis://redis:6379/0
+#    entrypoint: ["/bin/bash", "/app/entrypoint.sh"]
     networks:
       - app-network
 

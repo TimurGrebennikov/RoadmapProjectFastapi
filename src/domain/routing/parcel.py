@@ -10,6 +10,9 @@ from src.domain.schemas.parcel import (
     ParcelTypeSchemas,
 )
 from src.domain.services.parcel import ParcelService
+from src.utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 router = APIRouter(tags=["parcels"])
 
@@ -25,6 +28,7 @@ async def get_parcel_types(
     service: ParcelService = Depends(get_parcel_service),  # noqa: B008
 ) -> list[ParcelTypeSchemas]:
     """Получить все типы посылок"""
+    logger.info("GET /parcel-types")
     return await service.get_parcel_types()
 
 
@@ -35,7 +39,9 @@ async def create_parcel(
     service: ParcelService = Depends(get_parcel_service),  # noqa: B008
 ) -> dict[str, int]:
     """Добавить посылку"""
+    logger.info("POST /parcels | session_id=%s | name=%s", session_id, parcel_data.name)
     parcel_id = await service.create_parcel(session_id, parcel_data)
+    logger.info("POST /parcels | создана посылка ID=%s", parcel_id)
     return {"parcel_id": parcel_id}
 
 
@@ -46,8 +52,15 @@ async def get_my_parcels(
     limit: int = 10,
     session_id: str = Depends(get_session_id),  # noqa: B008
     service: ParcelService = Depends(get_parcel_service),  # noqa: B008
-) -> list[ParcelResponseSchemas]:  # ← ДОБАВЬ ЭТУ АННОТАЦИЮ!
+) -> list[ParcelResponseSchemas]:
     """Получить список своих посылок с фильтрацией и пагинацией"""
+    logger.info(
+        "GET /parcels | session_id=%s | type_id=%s | skip=%s | limit=%s",
+        session_id,
+        type_id,
+        skip,
+        limit,
+    )
     return await service.get_user_parcels(
         session_id=session_id,
         type_id=type_id,
@@ -63,9 +76,11 @@ async def get_parcel(
     service: ParcelService = Depends(get_parcel_service),  # noqa: B008
 ) -> ParcelResponseSchemas:
     """Получить данные о посылке по ID"""
+    logger.info("GET /parcels/%s | session_id=%s", parcel_id, session_id)
     parcel = await service.get_parcel_by_id(parcel_id, session_id)
 
     if not parcel:
+        logger.warning("GET /parcels/%s | посылка не найдена", parcel_id)
         raise HTTPException(status_code=404, detail="Посылка не найдена")
 
     return parcel
